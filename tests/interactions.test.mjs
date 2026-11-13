@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
+import {getAttention,tokens} from '../dist/attention.js';
 
 test('The visual introduction and optional deep exploration respond correctly',async(t)=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
@@ -50,6 +51,41 @@ test('The visual introduction and optional deep exploration respond correctly',a
     viewportWidth=1200;window.dispatchEvent(new window.Event('resize'));
     assert.equal(q('#intro-constellation svg').getAttribute('viewBox'),'0 0 1080 315');
   });
+  await t.test('Every head connection begins at a visible query and reaches its target with the correct weight',()=>{
+    for(const tokenIndex of [5,3,1]){
+      q(`[data-intro-token="${tokenIndex}"]`).dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
+      for(let head=0;head<8;head++){
+        q(`[data-story-head="${head}"]`).click();
+        const source=q('#head-exhibit .head-query rect');
+        assert.ok(source,'Head illustration must include the visible source token');
+        assert.equal(q('#head-exhibit .head-query-value').textContent,tokens[tokenIndex]);
+        const sourceX=Number(source.getAttribute('x'))+Number(source.getAttribute('width'));
+        const sourceY=Number(source.getAttribute('y'))+Number(source.getAttribute('height'))/2;
+        const edges=qa('#head-exhibit .head-edge');
+        assert.equal(edges.length,8);
+        edges.forEach((edge,i)=>{
+          const target=q(`#head-exhibit .head-target[data-token-index="${i}"] rect`);
+          const endX=Number(target.getAttribute('x'));
+          const endY=Number(target.getAttribute('y'))+Number(target.getAttribute('height'))/2;
+          assert.ok(edge.getAttribute('d').startsWith(`M${sourceX} ${sourceY}C`));
+          assert.ok(edge.getAttribute('d').endsWith(`${endX} ${endY}`));
+          assert.ok(Math.abs(Number(edge.dataset.weight)-getAttention(head).weights[tokenIndex][i])<1e-12);
+        });
+      }
+    }
+    for(const width of [1440,1024,768,680,390,320]){
+      viewportWidth=width;window.dispatchEvent(new window.Event('resize'));
+      const bounds=q('#head-exhibit svg').getAttribute('viewBox').split(' ').map(Number);
+      assert.equal(qa('#head-exhibit .head-target').length,8);
+      for(const rect of qa('#head-exhibit rect')){
+        assert.ok(Number(rect.getAttribute('x'))>=0);
+        assert.ok(Number(rect.getAttribute('y'))>=0);
+        assert.ok(Number(rect.getAttribute('x'))+Number(rect.getAttribute('width'))<=bounds[2]);
+        assert.ok(Number(rect.getAttribute('y'))+Number(rect.getAttribute('height'))<=bounds[3]);
+      }
+    }
+    viewportWidth=1200;window.dispatchEvent(new window.Event('resize'));
+  });
   await t.test('The introductory journey pauses, resumes, finishes, replays and resets',async()=>{
     q('#play-journey').click();
     assert.ok(q('#journey-exhibit').classList.contains('is-playing'));
@@ -85,6 +121,8 @@ test('The visual introduction and optional deep exploration respond correctly',a
     assert.equal(q('#attention').open,true);
   });
   await t.test('Attention updates from calculated data and shows 64 matrix cells',()=>{
+    q('[data-token="5"]').click();
+    q('#head-select').value='0';q('#head-select').dispatchEvent(new window.Event('change'));
     const initial=q('#step-numbers').textContent;
     q('[data-token="1"]').click();
     assert.equal(q('[data-token="1"]').getAttribute('aria-pressed'),'true');

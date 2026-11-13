@@ -168,6 +168,16 @@ function renderAttention(){
   renderStory();
 }
 
+// This exhibit owns its source node; lab connections depend on a token row
+// above the SVG and cannot be reused here without leaving a floating origin.
+function renderHeadExhibit(){
+  const weights=attention.weights[state.token],max=Math.max(...weights);
+  const rows=tokens.map((token,i)=>({token,y:35+i*44,weight:weights[i]}));
+  const edges=rows.map(({y,weight},i)=>`<path class="head-edge" data-token-index="${i}" data-weight="${weight}" d="M150 190C245 190 255 ${y} 350 ${y}" stroke-width="${1+weight/max*5}" opacity="${.18+weight/max*.62}"/>`).join('');
+  const targets=rows.map(({token,y,weight},i)=>`<g class="head-target ${i===state.token?'current-target':''}" data-token-index="${i}"><title>${token}, vị trí ${i+1}: ${percent(weight)}</title><rect x="350" y="${y-18}" width="190" height="36" rx="7" style="fill:rgba(116,155,83,${.06+weight/max*.18})"/><text x="445" y="${y+7}">${token}</text><circle cx="350" cy="${y}" r="3"/></g>`).join('');
+  return `<svg viewBox="0 0 560 380" role="img" aria-label="Attention head ${state.head+1}: từ ${tokens[state.token]}, vị trí ${state.token+1}, kết nối đến cả 8 token trong câu"><title>${rows.map(({token,weight},i)=>`${token} (${i+1}): ${percent(weight)}`).join('; ')}</title>${edges}${targets}<text class="head-query-caption" x="85" y="145">TỪ ĐANG CHỌN</text><g class="head-query ${tokens[state.token].length>6?'long-query':''}"><rect x="20" y="164" width="130" height="52" rx="9"/><text class="head-query-value" x="85" y="199">${tokens[state.token]}</text><circle cx="150" cy="190" r="4"/></g></svg>`;
+}
+
 // The introduction shows the same attention data without numerical machinery.
 function renderStory(){
   const narrow=matchMedia('(max-width:680px)').matches;
@@ -192,7 +202,7 @@ function renderStory(){
   $$('[data-story-head]').forEach(el=>{const active=Number(el.dataset.storyHead)===state.head;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
   $('#story-head-label').textContent=`Head ${String(state.head+1).padStart(2,'0')} / 08`;
   $('#head-source').textContent=`Đang quan sát token “${tokens[state.token]}”`;
-  $('#head-exhibit').innerHTML=narrow?figure(false):renderConnections(false);
+  $('#head-exhibit').innerHTML=renderHeadExhibit();
   $('#head-select').value=String(state.head);
 }
 function chooseIntroToken(event){
