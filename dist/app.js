@@ -68,12 +68,12 @@ function archLine(x,y1,y2){return `<path class="arch-line" d="M${x} ${y1}V${y2}"
 function residual(x,y1,y2){return `<path class="arch-residual" d="M${x+18} ${y1}H${x}V${y2}H${x+18}"/><circle cx="${x+18}" cy="${y1}" r="2" fill="#a3b393"/>`;}
 $('#architecture-svg').innerHTML=`<svg viewBox="0 0 680 700" role="group" aria-label="Kiến trúc Transformer gốc. Dữ liệu đi từ dưới lên. Chọn khối để xem giải thích."><defs><marker id="arch-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#9ba992"/></marker></defs>
 <rect x="35" y="244" width="253" height="273" rx="9" fill="#f1f6ec90" stroke="#bacdad" stroke-dasharray="4 4"/><rect x="375" y="121" width="253" height="396" rx="9" fill="#fcf2e450" stroke="#dac3a3" stroke-dasharray="4 4"/>
-<text class="arch-title" x="162" y="225">Encoder <tspan font-size="10" fill="#8d9e80">×6</tspan></text><text class="arch-title" x="502" y="574" style="fill:#ab8150">Decoder ×6</text>
+<text class="arch-title" x="162" y="225">Encoder <tspan style="font-size:calc(10px * var(--text-scale))" fill="#8d9e80">×6</tspan></text><text class="arch-title" x="502" y="574" style="fill:#ab8150">Decoder ×6</text>
 ${block('softmax',410,20,185,'Softmax',true)}${block('linear',410,75,185,'Linear',true)}
 ${block('norm',70,264,185,'Add & Norm')}${block('ffn',70,324,185,'Feed Forward')}${block('norm',70,384,185,'Add & Norm')}${block('self',70,454,185,'Multi-Head Attention')}
 ${block('norm',410,144,185,'Add & Norm',true)}${block('ffn',410,204,185,'Feed Forward',true)}${block('norm',410,264,185,'Add & Norm',true)}${block('cross',410,324,185,'Cross-Attention',true)}${block('norm',410,384,185,'Add & Norm',true)}${block('masked',410,454,185,'Masked Self-Attention',true)}
 ${block('embedding',70,588,185,'Input Embedding')}${block('embedding',410,588,185,'Output Embedding',true)}
-${[162,502].map(x=>`${archLine(x,588,561)}<circle cx="${x}" cy="550" r="12" fill="#f9fbf5" stroke="#a7bd95"/><text class="arch-small" x="${x}" y="554" style="font-size:16px">+</text>${archLine(x,538,491)}${archLine(x,635,625)}`).join('')}
+${[162,502].map(x=>`${archLine(x,588,561)}<circle cx="${x}" cy="550" r="12" fill="#f9fbf5" stroke="#a7bd95"/><text class="arch-small" x="${x}" y="554" style="font-size:calc(16px * var(--text-scale))">+</text>${archLine(x,538,491)}${archLine(x,635,625)}`).join('')}
 ${block('position',5,535,112,'Positional',false,30)}<path class="arch-line" d="M117 550H148"/>${block('position',345,535,112,'Positional',true,30)}<path class="arch-line" d="M457 550H488"/>
 ${archLine(162,454,421)}${archLine(162,384,361)}${archLine(162,324,301)}
 ${archLine(502,454,421)}${archLine(502,384,361)}${archLine(502,324,301)}${archLine(502,264,241)}${archLine(502,204,181)}${archLine(502,144,112)}${archLine(502,75,57)}
