@@ -26,6 +26,8 @@ Cài công cụ kiểm tra bằng `npm install` trước lần chạy test đầ
 
 - `dist/index.html`: câu chuyện giới thiệu và các khu vực khám phá tùy chọn.
 - `dist/story.css`: giao diện giới thiệu responsive, hỗ trợ reduced motion.
+- `dist/illustrations.js`: bộ sơ đồ SVG vẽ riêng: token/vector, 8 head song song và 6+6 lớp Encoder–Decoder; có bố cục riêng cho màn hình nhỏ.
+- `dist/assets/`: bản SVG và PNG xuất từ cùng mã vẽ, có thể dùng độc lập.
 - `dist/styles.css`: kiểu dáng của các lab và sơ đồ chi tiết, được story.css sử dụng lại.
 - `dist/app.js`: sơ đồ tương tác, đồng bộ token/head, luồng dịch có thể dừng/tiếp tục, lab Attention, Decoder và chi phí n².
 - `dist/attention.js`: phép chiếu Q/K/V, scaled dot-product attention và causal mask.
@@ -40,3 +42,13 @@ Lab dùng vector 4 chiều và d_k = 3 để dễ theo dõi. Ma trận chiếu �
 Sơ đồ bám cấu hình base gốc: 6 lớp Encoder, 6 lớp Decoder, 8 head, d_model = 512, d_ff = 2048, positional encoding sin/cos và Post-LN. Mỗi khung chỉ vẽ một lớp đại diện. Token trong ví dụ được tách theo từ để dễ đọc, không mô phỏng tokenizer subword của paper.
 
 Nguồn: https://arxiv.org/abs/1706.03762
+
+## Tham khảo hình ảnh
+
+Tham khảo ngôn ngữ hình ảnh của [The Illustrated Transformer — Jay Alammar (2018)](https://jalammar.github.io/illustrated-transformer/): vector/ma trận thành ô màu, phân cấp mô hình và các luồng dữ liệu rõ ràng. Sơ đồ trong dự án được vẽ riêng, không dùng lại ảnh gốc. Các ô màu là ký hiệu rút gọn; hình tĩnh không biểu diễn giá trị đo hay toàn bộ kích thước tensor.
+
+Xuất lại bộ ảnh SVG/PNG sau khi sửa `illustrations.js`:
+
+```sh
+npm run figures
+```

@@ -1,4 +1,5 @@
 import {tokens,inputs,getAttention,causalMask} from './attention.js';
+import {embeddingIllustration,multiHeadIllustration,architectureIllustration} from './illustrations.js';
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const fmt = (n) => n.toFixed(2);
@@ -6,6 +7,15 @@ const percent = (n) => (n*100).toFixed(1)+'%';
 const state = {token:5,head:0,step:0,view:'connections',generated:0};
 let attention = getAttention();
 const journey = {count:0,playing:false,timer:null};
+let overviewCompact;
+function renderOverviewIllustration(){
+  const compact=matchMedia('(max-width:680px)').matches;
+  if(compact===overviewCompact)return;
+  overviewCompact=compact;
+  $('#embedding-illustration').innerHTML=embeddingIllustration(compact);
+  $('#overview-illustration').innerHTML=architectureIllustration(compact);
+}
+renderOverviewIllustration();
 
 // Three quiet navigation links replace the numbered lesson outline.
 const chapterLinks = $$('.story-nav a');
@@ -203,6 +213,7 @@ function renderStory(){
   $('#story-head-label').textContent=`Head ${String(state.head+1).padStart(2,'0')} / 08`;
   $('#head-source').textContent=`Đang quan sát token “${tokens[state.token]}”`;
   $('#head-exhibit').innerHTML=renderHeadExhibit();
+  $('#multihead-illustration').innerHTML=multiHeadIllustration(state.head,narrow);
   $('#head-select').value=String(state.head);
 }
 function chooseIntroToken(event){
@@ -250,6 +261,7 @@ renderDecoder();
 
 // A short, pausable story: input → context → one target token at a time.
 function renderJourney(){
+  renderOverviewIllustration();
   const finished=journey.count===target.length;
   $('#journey-exhibit').classList.toggle('is-playing',journey.playing);
   $('#encoder-stack').classList.toggle('working',journey.playing&&journey.count===0);
@@ -259,6 +271,7 @@ function renderJourney(){
   $('#reset-journey').disabled=journey.count===0&&!journey.playing;
   $('#journey-phase').textContent=finished?'Hoàn thành':journey.playing?(journey.count===0?'Encoder tạo ngữ cảnh':'Decoder đang tạo câu'):journey.count>0?'Tạm dừng':'Sẵn sàng';
   $('#journey-status').textContent=finished?'“Tôi thích học” — gặp <EOS>, dừng sinh câu.':journey.playing?(journey.count===0?'Encoder tạo biểu diễn cho câu nguồn.':`Đã tạo “${target.slice(0,journey.count).join(' ')}”. Decoder tiếp tục dự đoán.`):journey.count>0?'Có thể tiếp tục từ token đang dừng.':'Bấm chạy để theo dõi luồng dữ liệu.';
+  $('#diagram-output-token').textContent=journey.count>0?target[journey.count-1]:'Token tiếp theo';
 }
 function tickJourney(){
   if(!journey.playing)return;
@@ -277,6 +290,7 @@ $('#play-journey').addEventListener('click',()=>{
 $('#reset-journey').addEventListener('click',()=>{clearTimeout(journey.timer);journey.count=0;journey.playing=false;renderJourney();});
 addEventListener('pagehide',()=>{clearTimeout(journey.timer);journey.playing=false;});
 renderJourney();
+addEventListener('resize',renderJourney);
 
 function renderComplexity(){
   const n=Number($('#length-slider').value);

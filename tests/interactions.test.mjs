@@ -37,6 +37,8 @@ test('The visual introduction and optional deep exploration respond correctly',a
     q('[data-story-head="3"]').click();
     assert.equal(q('#head-select').value,'3');
     assert.equal(q('[data-story-head="3"]').getAttribute('aria-pressed'),'true');
+    assert.equal(qa('#multihead-illustration [data-figure-head]').length,8);
+    assert.equal(q('#multihead-illustration [data-figure-head="3"]').dataset.active,'true');
     assert.notEqual(q('#head-exhibit').innerHTML,initial);
     q('[data-intro-token="5"]').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
   });
@@ -97,6 +99,11 @@ test('The visual introduction and optional deep exploration respond correctly',a
     await new Promise(resolve=>setTimeout(resolve,230));
     assert.equal(qa('.journey-token').length,4);
     assert.ok(q('#journey-status').textContent.includes('<EOS>'));
+    assert.equal(q('#diagram-output-token').textContent,'<EOS>');
+    viewportWidth=360;window.dispatchEvent(new window.Event('resize'));
+    assert.equal(q('#diagram-output-token').textContent,'<EOS>');
+    assert.equal(qa('#overview-illustration .overview-layer').length,12);
+    viewportWidth=1200;window.dispatchEvent(new window.Event('resize'));
     assert.ok(!q('#journey-exhibit').classList.contains('is-playing'));
     q('#play-journey').click();
     assert.equal(qa('.journey-token').length,0);
