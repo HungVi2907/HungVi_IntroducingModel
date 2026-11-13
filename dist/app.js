@@ -1,7 +1,10 @@
 import {tokens,inputs,getAttention,causalMask} from './attention.js';
 import {embeddingIllustration,multiHeadIllustration,architectureIllustration} from './illustrations.js';
+import {initializeReferenceGalleries} from './reference-gallery.js';
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
+const referenceGalleries=initializeReferenceGalleries(document);
+addEventListener('pagehide',referenceGalleries.stopAll);
 const fmt = (n) => n.toFixed(2);
 const percent = (n) => (n*100).toFixed(1)+'%';
 const state = {token:5,head:0,step:0,view:'connections',generated:0};
@@ -19,7 +22,7 @@ renderOverviewIllustration();
 
 // Three quiet navigation links replace the numbered lesson outline.
 const chapterLinks = $$('.story-nav a');
-const sections = ['idea','architecture','explore'].map(id=>document.getElementById(id));
+const sections = ['visual-tour','architecture','explore'].map(id=>document.getElementById(id));
 function updateReadingPosition() {
   let current = null;
   for (const section of sections) if (section.getBoundingClientRect().top<innerHeight*.36) current=section;

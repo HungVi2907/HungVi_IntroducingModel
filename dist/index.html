@@ -13,14 +13,26 @@
   <a class="skip" href="#main">Đến nội dung</a>
   <header class="site-header">
     <a class="wordmark" href="#overview" aria-label="Transformer, về đầu trang"><span class="wordmark-icon" aria-hidden="true">✳</span>transformer<span>.</span></a>
-    <nav class="story-nav" aria-label="Điều hướng chính"><a href="#idea" data-section="idea">Ý tưởng</a><a href="#architecture" data-section="architecture">Kiến trúc</a><a href="#explore" data-section="explore">Khám phá</a></nav>
+    <nav class="story-nav" aria-label="Điều hướng chính"><a href="#visual-tour" data-section="idea">Ý tưởng</a><a href="#architecture" data-section="architecture">Kiến trúc</a><a href="#explore" data-section="explore">Khám phá</a></nav>
     <a class="original-paper" href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener noreferrer">Bài báo gốc <span>↗</span></a>
   </header>
   <main id="main">
     <section id="overview" class="intro-hero story-section">
       <div class="intro-copy"><p class="story-eyebrow hero-paper-title"><span class="status-dot" aria-hidden="true"></span><span>ATTENTION IS ALL YOU NEED</span><span class="paper-year">· 2017</span></p><h1>Một từ.<br>Cả một <span>ngữ cảnh.</span></h1><p>Một từ có nghĩa hơn khi đặt giữa những từ khác.<br>Transformer tạo ra những kết nối đó bằng Attention.</p></div>
       <div class="constellation"><div class="constellation-top"><span>MỘT CÂU, NHIỀU KẾT NỐI</span><span class="interaction-hint"><i></i> Chạm vào một từ bên dưới</span></div><div class="constellation-scroll"><div id="intro-constellation"></div></div><div class="constellation-caption"><span id="intro-caption" aria-live="polite">Trong câu này, “it” có thể chỉ “the cat”.</span><span class="illustration-tag">Minh họa Attention</span></div></div>
-      <div class="hero-tail"><a class="story-button" href="#idea">Theo dòng một câu <span>↓</span></a><span>Một ý tưởng năm 2017.<br>Nền tảng cho nhiều mô hình ngôn ngữ sau này.</span></div>
+      <div class="hero-tail"><a class="story-button" href="#visual-tour">Nhìn bức tranh lớn <span>↓</span></a><span>Một ý tưởng năm 2017.<br>Nền tảng cho nhiều mô hình ngôn ngữ sau này.</span></div>
+    </section>
+
+    <section id="visual-tour" class="reference-story story-section">
+      <div class="reference-section-heading"><div><p class="story-eyebrow">NHÌN TỪ TỔNG THỂ</p><h2>Mở dần một ý tưởng.</h2></div><p>Từ một hộp xử lý đến hai nửa phối hợp.<br>Chọn một hình để nhìn gần hơn.</p></div>
+<div class="reference-gallery" data-reference-gallery="overview">
+  <div class="reference-gallery-tabs" role="tablist" aria-label="Các góc nhìn tổng quan"></div>
+  <figure class="reference-panel" id="overview-reference-panel" role="tabpanel" tabindex="0">
+    <div class="reference-image-stage"><img class="reference-main-image" src="./assets/jay-alammar/the_transformer_3.png" alt="Một đầu vào. Một câu mới." width="1127" height="294" loading="lazy" decoding="async"></div>
+    <figcaption class="reference-caption"><div class="reference-caption-copy"><h3 class="reference-image-title">Một đầu vào. Một câu mới.</h3><p class="reference-image-caption">Một câu đi vào, một câu dịch đi ra.</p><p class="reference-image-note" hidden></p></div><div class="reference-actions"><button class="reference-play" type="button" aria-pressed="false" hidden>▷ Phát ảnh động</button><button class="reference-enlarge" type="button">Phóng lớn <span aria-hidden="true">↗</span></button></div></figcaption>
+  </figure>
+  <p class="reference-credit">Ảnh: <a class="reference-original" href="https://jalammar.github.io/images/t/the_transformer_3.png" target="_blank" rel="noopener noreferrer">Jay Alammar</a> · <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">The Illustrated Transformer</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+</div>
     </section>
 
     <section id="idea" class="story-moment story-section">
@@ -33,7 +45,14 @@
     <section id="architecture" class="architecture-story story-section">
       <div class="centered-copy"><p class="story-eyebrow">ENCODER → DECODER</p><h2>Từ một câu,<br>đến một câu khác.</h2><p>Encoder xây dựng ngữ cảnh từ câu nguồn.<br>Decoder dùng ngữ cảnh đó để tạo câu đích, từng token một.</p></div>
       <div class="journey-exhibit" id="journey-exhibit"><div class="journey-topline"><span>TRANSFORMER GỐC · ENCODER–DECODER</span><span id="journey-phase">Sẵn sàng</span></div><div id="overview-illustration" class="journey-architecture"></div><div class="journey-output"><span class="flow-label">CÂU ĐÍCH</span><div id="journey-tokens" class="journey-tokens" aria-live="polite"><span class="output-placeholder">Một câu mới đang chờ được tạo…</span></div><div class="feedback-loop"><span aria-hidden="true">↳</span> Token vừa sinh được đưa trở lại Decoder</div></div><div class="journey-controls"><button class="story-button" id="play-journey"><span aria-hidden="true">▷</span> Chạy một lượt</button><button class="journey-reset" id="reset-journey" aria-label="Đặt lại minh họa dịch câu" disabled>↺</button><p id="journey-status" aria-live="polite">Bấm chạy để theo dõi luồng dữ liệu.</p></div><p class="journey-disclaimer">Bản dịch được đặt sẵn để minh họa quá trình sinh chuỗi. Sơ đồ đọc từ dưới lên.</p></div>
-      <details class="architecture-reveal" id="architecture-details"><summary><span>Nhìn vào bên trong <span class="reveal-subtitle">Khám phá sơ đồ đầy đủ của paper</span></span><span class="reveal-icon">+</span></summary><div class="architecture-reveal-body"><div class="architecture-lab"><div class="architecture-diagram"><div class="panel-topline"><span><i class="small-dot"></i> SƠ ĐỒ TƯƠNG TÁC</span><span>Bấm vào một khối ↓</span></div><div id="architecture-svg"></div><div class="diagram-key"><span><i class="green-dot"></i> Encoder</span><span><i class="orange-dot"></i> Decoder</span><span>↑ Dữ liệu đi từ dưới lên</span></div></div><div class="component-panel" id="component-panel" aria-live="polite"></div></div>
+      <details class="architecture-reveal" id="architecture-details"><summary><span>Nhìn vào bên trong <span class="reveal-subtitle">Khám phá sơ đồ đầy đủ của paper</span></span><span class="reveal-icon">+</span></summary><div class="architecture-reveal-body"><div class="mechanism-reference-heading"><p class="story-eyebrow">THEO CÁC ĐƯỜNG NỐI</p><h3>Những gì diễn ra bên trong.</h3><p>Ảnh gốc đi cùng chú thích tiếng Việt. Chọn “Sinh từng token” để xem minh họa decoding.</p></div><div class="reference-gallery" data-reference-gallery="mechanism">
+  <div class="reference-gallery-tabs" role="tablist" aria-label="Các hình cơ chế bên trong"></div>
+  <figure class="reference-panel" id="mechanism-reference-panel" role="tabpanel" tabindex="0">
+    <div class="reference-image-stage"><img class="reference-main-image" src="./assets/jay-alammar/transformer_resideual_layer_norm.png" alt="Theo đường đi của hai token." width="666" height="483" loading="lazy" decoding="async"></div>
+    <figcaption class="reference-caption"><div class="reference-caption-copy"><h3 class="reference-image-title">Theo đường đi của hai token.</h3><p class="reference-image-caption">Đọc từ dưới lên: thêm vị trí, Attention, Add & Norm và Feed Forward.</p><p class="reference-image-note" hidden></p></div><div class="reference-actions"><button class="reference-play" type="button" aria-pressed="false" hidden>▷ Phát ảnh động</button><button class="reference-enlarge" type="button">Phóng lớn <span aria-hidden="true">↗</span></button></div></figcaption>
+  </figure>
+  <p class="reference-credit">Ảnh: <a class="reference-original" href="https://jalammar.github.io/images/t/transformer_resideual_layer_norm.png" target="_blank" rel="noopener noreferrer">Jay Alammar</a> · <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">The Illustrated Transformer</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+</div><div class="interactive-architecture-heading"><h3>Tự khám phá từng khối</h3><p>Chọn một khối trong sơ đồ tương tác dưới đây.</p></div><div class="architecture-lab"><div class="architecture-diagram"><div class="panel-topline"><span><i class="small-dot"></i> SƠ ĐỒ TƯƠNG TÁC</span><span>Bấm vào một khối ↓</span></div><div id="architecture-svg"></div><div class="diagram-key"><span><i class="green-dot"></i> Encoder</span><span><i class="orange-dot"></i> Decoder</span><span>↑ Dữ liệu đi từ dưới lên</span></div></div><div class="component-panel" id="component-panel" aria-live="polite"></div></div>
         <p class="caption">Vẽ lại theo Figure 1 của paper. Mỗi khung nét đứt là một lớp, được xếp chồng 6 lần. Add & Norm dùng thứ tự <strong>Post-LN</strong> của mô hình gốc.</p>
       </div></details>
     </section>
@@ -59,7 +78,13 @@
     </section>
     <section class="paper-outro"><p class="story-eyebrow">Ý TƯỞNG BẮT ĐẦU TỪ ĐÂY</p><h2>Attention Is All You Need.</h2><p>Vaswani và cộng sự · 2017</p><a class="story-button light-button" href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener noreferrer">Đọc bài báo gốc <span>↗</span></a><span class="outro-spark" aria-hidden="true">✳</span></section>
   </main>
-  <p class="visual-credit">Tham khảo cách minh họa: <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">The Illustrated Transformer — Jay Alammar ↗</a>. Các sơ đồ trên trang được vẽ riêng.</p><footer class="site-footer"><a href="#overview" class="wordmark">transformer<span>.</span></a><p>Một trải nghiệm trực quan về kiến trúc Transformer gốc.<br>Các ví dụ là mô phỏng để giới thiệu cơ chế.</p><a href="#overview">Trở về đầu ↑</a></footer>
+  <p class="visual-credit">Tham khảo cách minh họa: <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">The Illustrated Transformer — Jay Alammar ↗</a>. Sơ đồ tương tác được vẽ riêng; các ảnh tham khảo có ghi nguồn bên dưới.</p><footer class="site-footer"><a href="#overview" class="wordmark">transformer<span>.</span></a><p>Một trải nghiệm trực quan về kiến trúc Transformer gốc.<br>Các ví dụ là mô phỏng để giới thiệu cơ chế.</p><a href="#overview">Trở về đầu ↑</a></footer>
+  <dialog id="reference-lightbox" class="reference-lightbox" aria-labelledby="reference-lightbox-title">
+    <div class="lightbox-header"><div><p>ẢNH MINH HỌA · JAY ALAMMAR</p><h2 id="reference-lightbox-title">Ảnh minh họa Transformer</h2></div><button id="reference-lightbox-close" type="button" aria-label="Đóng ảnh phóng lớn">×</button></div>
+    <div class="lightbox-toolbar"><button id="reference-zoom-toggle" type="button" aria-pressed="false">Phóng to</button><span>Cuộn hoặc vuốt để xem ảnh khi phóng to.</span><a class="lightbox-original" href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">Ảnh gốc ↗</a></div>
+    <div class="lightbox-viewport"><img class="lightbox-image" alt="Ảnh đang được phóng lớn"></div>
+    <p class="lightbox-credit">Jay Alammar · <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener noreferrer">The Illustrated Transformer</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a></p>
+  </dialog>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

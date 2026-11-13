@@ -1,0 +1,64 @@
+{
+  "images": [
+    {
+      "file": "the_transformer_3.png",
+      "width": 1127,
+      "height": 294,
+      "source": "https://jalammar.github.io/images/t/the_transformer_3.png",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    {
+      "file": "The_transformer_encoders_decoders.png",
+      "width": 756,
+      "height": 474,
+      "source": "https://jalammar.github.io/images/t/The_transformer_encoders_decoders.png",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    {
+      "file": "The_transformer_encoder_decoder_stack.png",
+      "width": 1218,
+      "height": 793,
+      "source": "https://jalammar.github.io/images/t/The_transformer_encoder_decoder_stack.png",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    {
+      "file": "transformer_decoding_2.gif",
+      "width": 1438,
+      "height": 790,
+      "source": "https://jalammar.github.io/images/t/transformer_decoding_2.gif",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    {
+      "file": "transformer_resideual_layer_norm_3.png",
+      "width": 1415,
+      "height": 804,
+      "source": "https://jalammar.github.io/images/t/transformer_resideual_layer_norm_3.png",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    {
+      "file": "transformer_resideual_layer_norm.png",
+      "width": 666,
+      "height": 483,
+      "source": "https://jalammar.github.io/images/t/transformer_resideual_layer_norm.png",
+      "author": "Jay Alammar",
+      "article": "https://jalammar.github.io/illustrated-transformer/",
+      "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    }
+  ],
+  "poster": {
+    "file": "decoding-poster.png",
+    "from": "transformer_decoding_2.gif",
+    "frame": 40,
+    "change": "Static poster frame extracted for opt-in animation"
+  }
+}
