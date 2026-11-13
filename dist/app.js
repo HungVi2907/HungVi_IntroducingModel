@@ -5,17 +5,16 @@ const fmt = (n) => n.toFixed(2);
 const percent = (n) => (n*100).toFixed(1)+'%';
 const state = {token:5,head:0,step:0,view:'connections',generated:0};
 let attention = getAttention();
+const journey = {count:0,playing:false,timer:null};
 
-// Reading navigation.
-const chapterLinks = $$('.chapters a');
-const sections = $$('.chapter-section');
+// Three quiet navigation links replace the numbered lesson outline.
+const chapterLinks = $$('.story-nav a');
+const sections = ['idea','architecture','explore'].map(id=>document.getElementById(id));
 function updateReadingPosition() {
-  const max = document.documentElement.scrollHeight-innerHeight;
-  $('#reading-progress').style.width = (max>0?scrollY/max*100:0)+'%';
-  let current = sections[0];
+  let current = null;
   for (const section of sections) if (section.getBoundingClientRect().top<innerHeight*.36) current=section;
   chapterLinks.forEach(link => {
-    const active = link.hash==='#'+current.id;
+    const active = !!current && link.hash==='#'+current.id;
     link.classList.toggle('active',active);
     if(active) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current');
   });
@@ -23,6 +22,21 @@ function updateReadingPosition() {
 addEventListener('scroll',updateReadingPosition,{passive:true});
 addEventListener('resize',updateReadingPosition);
 updateReadingPosition();
+
+function revealTarget(hash) {
+  if(!hash || hash==='#')return;
+  const target=document.getElementById(decodeURIComponent(hash.slice(1)));
+  if(!target)return;
+  for(let node=target;node&&node!==document.body;node=node.parentElement){
+    if(node.tagName==='DETAILS')node.open=true;
+  }
+}
+document.addEventListener('click',event=>{
+  const link=event.target.closest('a[href^="#"]');
+  if(link)revealTarget(link.hash);
+});
+addEventListener('hashchange',()=>revealTarget(location.hash));
+revealTarget(location.hash);
 
 // Sequential versus parallel illustration.
 const sequenceWords = ['The','cat','is','sleeping'];
@@ -93,7 +107,10 @@ function componentDemo(kind){
 function selectComponent(id){
   const c=components[id];
   $$('.arch-block').forEach(el=>{const active=el.dataset.component===id;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
-  $('#component-panel').innerHTML=`<span class="component-index">DƯỚI KÍNH LÚP / ${String(Object.keys(components).indexOf(id)+1).padStart(2,'0')}</span><div class="component-title-group"><h3>${c.label}</h3><p class="component-english">${c.english}</p></div><p class="component-description">${c.description}</p><div class="component-demo">${componentDemo(c.kind)}<p class="component-demo-label">MINH HỌA CƠ CHẾ</p></div><p class="component-equation">${c.equation}</p><a class="text-link" href="${c.link}">${c.linkText}</a>`;
+  const firstSentence=c.description.indexOf('. ');
+  const short=firstSentence<0?c.description:c.description.slice(0,firstSentence+1);
+  const rest=firstSentence<0?'':c.description.slice(firstSentence+2);
+  $('#component-panel').innerHTML=`<span class="component-index">BÊN TRONG TRANSFORMER</span><div class="component-title-group"><h3>${c.label}</h3><p class="component-english">${c.english}</p></div><p class="component-description">${short}</p><div class="component-demo">${componentDemo(c.kind)}<p class="component-demo-label">MINH HỌA CƠ CHẾ</p></div><details class="component-more"><summary>Tìm hiểu thêm <span>+</span></summary><p>${rest}</p><p class="component-equation">${c.equation}</p></details><a class="text-link" href="${c.link}">${c.linkText}</a>`;
 }
 $$('.arch-block').forEach(el=>{el.addEventListener('click',()=>selectComponent(el.dataset.component));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectComponent(el.dataset.component);}});});
 selectComponent('self');
@@ -106,10 +123,10 @@ $$('[data-view]').forEach(el=>el.addEventListener('click',()=>{state.view=el.dat
 $$('[data-step]').forEach(el=>el.addEventListener('click',()=>{state.step=Number(el.dataset.step);renderAttention();}));
 $('#previous-step').addEventListener('click',()=>{if(state.step>0)state.step--;renderAttention();});
 $('#next-step').addEventListener('click',()=>{state.step=(state.step+1)%4;renderAttention();});
-function renderConnections(){
+function renderConnections(showWeights=true){
   const xs=tokens.map((_,i)=>i*95+47.5),source=xs[state.token];
   const weights=attention.weights[state.token],max=Math.max(...weights);
-  return `<svg viewBox="0 0 760 176" role="img" aria-label="Trọng số attention từ token ${tokens[state.token]}, head ${state.head+1}"><title>${tokens.map((t,i)=>`${t} vị trí ${i+1}: ${percent(weights[i])}`).join('; ')}</title>${xs.map((x,i)=>`<path class="connection-path" d="M${source} 2C${source} 62 ${x} 45 ${x} 105" stroke-width="${1+weights[i]/max*5}" opacity="${.15+weights[i]/max*.65}"/>`).join('')}${xs.map((x,i)=>`<g><rect class="connection-target ${i===state.token?'selected-target':''}" x="${x-40}" y="106" width="80" height="35" rx="5"/><text class="connection-label" x="${x}" y="128">${tokens[i]}</text><text class="connection-weight" x="${x}" y="163">${percent(weights[i])}</text></g>`).join('')}</svg>`;
+  return `<svg viewBox="0 0 760 ${showWeights?176:150}" role="img" aria-label="Trọng số attention từ token ${tokens[state.token]}, head ${state.head+1}"><title>${tokens.map((t,i)=>`${t} vị trí ${i+1}: ${percent(weights[i])}`).join('; ')}</title>${xs.map((x,i)=>`<path class="connection-path" d="M${source} 2C${source} 62 ${x} 45 ${x} 105" stroke-width="${1+weights[i]/max*5}" opacity="${.15+weights[i]/max*.65}"/>`).join('')}${xs.map((x,i)=>`<g><rect class="connection-target ${i===state.token?'selected-target':''}" x="${x-40}" y="106" width="80" height="35" rx="5"/><text class="connection-label" x="${x}" y="128">${tokens[i]}</text>${showWeights?`<text class="connection-weight" x="${x}" y="163">${percent(weights[i])}</text>`:''}</g>`).join('')}</svg>`;
 }
 function renderMatrix(){
   const max=Math.max(...attention.weights.flat());
@@ -148,7 +165,45 @@ function renderAttention(){
   $$('[data-row]').forEach(el=>el.addEventListener('click',()=>{state.token=Number(el.dataset.row);renderAttention();}));
   renderStep();
   $('#projection-data').textContent=`Head ${state.head+1} · ma trận mô phỏng\nX[${state.token+1}] = [${inputs[state.token].map(fmt).join(', ')}]\n\nWQ (4 × 3)\n${attention.wq.map(row=>row.map(fmt).join('  ')).join('\n')}\n\nWK (4 × 3)\n${attention.wk.map(row=>row.map(fmt).join('  ')).join('\n')}\n\nWV (4 × 4)\n${attention.wv.map(row=>row.map(fmt).join('  ')).join('\n')}`;
+  renderStory();
 }
+
+// The introduction shows the same attention data without numerical machinery.
+function renderStory(){
+  const narrow=matchMedia('(max-width:680px)').matches;
+  const xs=narrow?[70,205,350,490,70,205,350,490]:[65,185,305,445,605,745,865,1005];
+  const ys=tokens.map((_,i)=>narrow?(i<4?130:270):218);
+  const source=xs[state.token],weights=attention.weights[state.token],max=Math.max(...weights);
+  const focused=document.activeElement?.dataset?.introToken;
+  const arcs=xs.map((x,i)=>{
+    if(i===state.token)return '';
+    const high=narrow?Math.max(40,Math.min(ys[state.token],ys[i])-55-Math.abs(source-x)*.13):220-Math.min(245,60+Math.abs(source-x)*.32);
+    return `<path class="intro-arc" d="M${source} ${ys[state.token]}C${source} ${high} ${x} ${high} ${x} ${ys[i]}" stroke-width="${1+weights[i]/max*4}" opacity="${.13+weights[i]/max*.65}"/>`;
+  }).join('');
+  const makeWords=(interactive)=>tokens.map((token,i)=>{
+    const w=Math.max(75,token.length*(narrow?12:15)+26),x=xs[i],y=ys[i];
+    const control=interactive?`data-intro-token="${i}" role="button" tabindex="0" aria-label="Chọn token ${token}, vị trí ${i+1}" aria-pressed="${i===state.token}"`:'';
+    return `<g class="intro-token ${i===state.token?'selected':''}" ${control}><circle class="intro-node" cx="${x}" cy="${y}" r="3"/><rect x="${x-w/2}" y="${y+18}" width="${w}" height="49" rx="7"/><text x="${x}" y="${y+50}">${token}</text></g>`;
+  }).join('');
+  const figure=(interactive)=>`<svg viewBox="0 0 ${narrow?'560 350':'1080 315'}" role="${interactive?'group':'img'}" aria-label="${interactive?'Chọn một token để khám phá các kết nối Attention':'Phân bố kết nối tại head '+(state.head+1)} trong câu The cat is sleeping because it is tired"><text class="intro-figure-label" x="${narrow?280:540}" y="24">SELF-ATTENTION</text>${arcs}${makeWords(interactive)}</svg>`;
+  $('#intro-constellation').innerHTML=figure(true);
+  if(focused!==undefined)$(`[data-intro-token="${focused}"]`)?.focus();
+  $('#intro-caption').textContent=state.token===5?'Trong câu này, “it” có thể chỉ “the cat”.':`“${tokens[state.token]}” kết hợp thông tin từ các vị trí khác để tạo biểu diễn theo ngữ cảnh.`;
+  $$('[data-story-head]').forEach(el=>{const active=Number(el.dataset.storyHead)===state.head;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
+  $('#story-head-label').textContent=`Head ${String(state.head+1).padStart(2,'0')} / 08`;
+  $('#head-source').textContent=`Đang quan sát token “${tokens[state.token]}”`;
+  $('#head-exhibit').innerHTML=narrow?figure(false):renderConnections(false);
+  $('#head-select').value=String(state.head);
+}
+function chooseIntroToken(event){
+  const token=event.target.closest('[data-intro-token]');
+  if(!token)return;
+  state.token=Number(token.dataset.introToken);renderAttention();
+}
+$('#intro-constellation').addEventListener('click',chooseIntroToken);
+$('#intro-constellation').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseIntroToken(event);}});
+$$('[data-story-head]').forEach(el=>el.addEventListener('click',()=>{state.head=Number(el.dataset.storyHead);attention=getAttention(state.head);renderAttention();}));
+addEventListener('resize',renderStory);
 renderAttention();
 
 // Causal mask and illustrative autoregressive generation.
@@ -182,6 +237,36 @@ $('#mask-toggle').addEventListener('change',renderMask);
 $('#generate-token').addEventListener('click',()=>{if(state.generated<4)state.generated++;renderDecoder();});
 $('#reset-decoder').addEventListener('click',()=>{state.generated=0;renderDecoder();});
 renderDecoder();
+
+// A short, pausable story: input → context → one target token at a time.
+function renderJourney(){
+  const finished=journey.count===target.length;
+  $('#journey-exhibit').classList.toggle('is-playing',journey.playing);
+  $('#encoder-stack').classList.toggle('working',journey.playing&&journey.count===0);
+  $('#decoder-stack').classList.toggle('working',journey.playing&&journey.count>0);
+  $('#journey-tokens').innerHTML=journey.count===0?'<span class="output-placeholder">Một câu mới đang chờ được tạo…</span>':target.slice(0,journey.count).map((token,i)=>`<span class="journey-token ${i===3?'end-token':''}">${escapeHTML(token)}</span>`).join('');
+  $('#play-journey').innerHTML=journey.playing?'<span aria-hidden="true">Ⅱ</span> Tạm dừng':finished?'<span aria-hidden="true">↺</span> Xem lại':journey.count>0?'<span aria-hidden="true">▷</span> Tiếp tục':'<span aria-hidden="true">▷</span> Chạy một lượt';
+  $('#reset-journey').disabled=journey.count===0&&!journey.playing;
+  $('#journey-phase').textContent=finished?'Hoàn thành':journey.playing?(journey.count===0?'Encoder tạo ngữ cảnh':'Decoder đang tạo câu'):journey.count>0?'Tạm dừng':'Sẵn sàng';
+  $('#journey-status').textContent=finished?'“Tôi thích học” — gặp <EOS>, dừng sinh câu.':journey.playing?(journey.count===0?'Encoder tạo biểu diễn cho câu nguồn.':`Đã tạo “${target.slice(0,journey.count).join(' ')}”. Decoder tiếp tục dự đoán.`):journey.count>0?'Có thể tiếp tục từ token đang dừng.':'Bấm chạy để theo dõi luồng dữ liệu.';
+}
+function tickJourney(){
+  if(!journey.playing)return;
+  journey.count++;
+  if(journey.count===target.length)journey.playing=false;
+  renderJourney();
+  if(journey.playing)scheduleJourney();
+}
+function scheduleJourney(){journey.timer=setTimeout(tickJourney,matchMedia('(prefers-reduced-motion: reduce)').matches?40:1000);}
+$('#play-journey').addEventListener('click',()=>{
+  clearTimeout(journey.timer);
+  if(journey.playing){journey.playing=false;renderJourney();return;}
+  if(journey.count===target.length)journey.count=0;
+  journey.playing=true;renderJourney();scheduleJourney();
+});
+$('#reset-journey').addEventListener('click',()=>{clearTimeout(journey.timer);journey.count=0;journey.playing=false;renderJourney();});
+addEventListener('pagehide',()=>{clearTimeout(journey.timer);journey.playing=false;});
+renderJourney();
 
 function renderComplexity(){
   const n=Number($('#length-slider').value);

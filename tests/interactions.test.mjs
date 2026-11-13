@@ -3,26 +3,86 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
 
-test('The complete learning journey responds to token, head, stage, mask, decoding and length changes',async(t)=>{
+test('The visual introduction and optional deep exploration respond correctly',async(t)=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
   const dom=new JSDOM(html,{url:'http://localhost:5173/'});
   const {window}=dom;
   const q=(s)=>window.document.querySelector(s);
   const qa=(s)=>[...window.document.querySelectorAll(s)];
   globalThis.document=window.document;
+  globalThis.location=window.location;
   globalThis.innerHeight=900;
   globalThis.scrollY=0;
   globalThis.addEventListener=window.addEventListener.bind(window);
-  globalThis.matchMedia=()=>({matches:true});
+  let viewportWidth=1200;
+  globalThis.matchMedia=(query)=>({matches:query.includes('reduced-motion')||(query.includes('max-width')&&viewportWidth<=680)});
   await import('../dist/app.js');
 
+  await t.test('Main experience is an introduction; technical panels start closed',()=>{
+    assert.equal(q('.sidebar'),null);
+    assert.equal(qa('.story-nav a').length,3);
+    assert.equal(qa('[data-intro-token]').length,8);
+    for(const id of ['architecture-details','attention','decoder','tradeoffs']){
+      assert.equal(q('#'+id).open,false);
+    }
+    assert.ok(q('#step-numbers').closest('details'));
+    assert.equal(qa('#head-exhibit .connection-weight').length,0);
+  });
+  await t.test('Intro token and head selection synchronize across the whole page',()=>{
+    q('[data-intro-token="1"]').dispatchEvent(new window.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+    assert.equal(q('[data-intro-token="1"]').getAttribute('aria-pressed'),'true');
+    assert.equal(q('[data-token="1"]').getAttribute('aria-pressed'),'true');
+    const initial=q('#head-exhibit').innerHTML;
+    q('[data-story-head="3"]').click();
+    assert.equal(q('#head-select').value,'3');
+    assert.equal(q('[data-story-head="3"]').getAttribute('aria-pressed'),'true');
+    assert.notEqual(q('#head-exhibit').innerHTML,initial);
+    q('[data-intro-token="5"]').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
+  });
+  await t.test('The complete sentence fits the mobile diagram and returns to one row on desktop',()=>{
+    viewportWidth=360;window.dispatchEvent(new window.Event('resize'));
+    assert.equal(q('#intro-constellation svg').getAttribute('viewBox'),'0 0 560 350');
+    for(const rect of qa('#intro-constellation .intro-token rect')){
+      assert.ok(Number(rect.getAttribute('x'))>=0);
+      assert.ok(Number(rect.getAttribute('x'))+Number(rect.getAttribute('width'))<=560);
+      assert.ok(Number(rect.getAttribute('y'))+Number(rect.getAttribute('height'))<=350);
+    }
+    viewportWidth=1200;window.dispatchEvent(new window.Event('resize'));
+    assert.equal(q('#intro-constellation svg').getAttribute('viewBox'),'0 0 1080 315');
+  });
+  await t.test('The introductory journey pauses, resumes, finishes, replays and resets',async()=>{
+    q('#play-journey').click();
+    assert.ok(q('#journey-exhibit').classList.contains('is-playing'));
+    q('#play-journey').click();
+    assert.ok(!q('#journey-exhibit').classList.contains('is-playing'));
+    await new Promise(resolve=>setTimeout(resolve,60));
+    assert.equal(qa('.journey-token').length,0);
+    q('#play-journey').click();
+    await new Promise(resolve=>setTimeout(resolve,230));
+    assert.equal(qa('.journey-token').length,4);
+    assert.ok(q('#journey-status').textContent.includes('<EOS>'));
+    assert.ok(!q('#journey-exhibit').classList.contains('is-playing'));
+    q('#play-journey').click();
+    assert.equal(qa('.journey-token').length,0);
+    q('#reset-journey').click();
+    assert.equal(q('#reset-journey').disabled,true);
+    assert.ok(!q('#journey-exhibit').classList.contains('is-playing'));
+  });
+
   await t.test('Every architecture block opens its explanation with keyboard or click',()=>{
+    q('#architecture-details').open=true;
     for(const el of qa('.arch-block')){
       el.dispatchEvent(new window.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
       assert.equal(el.getAttribute('aria-pressed'),'true');
       assert.ok(q('#component-panel h3').textContent.length>0);
       assert.ok(q('#component-panel .component-equation').textContent.length>0);
     }
+  });
+  await t.test('A link into a collapsed lab opens its containing disclosure',()=>{
+    q('#attention').open=false;
+    q('[data-component="self"]').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
+    q('#component-panel a').click();
+    assert.equal(q('#attention').open,true);
   });
   await t.test('Attention updates from calculated data and shows 64 matrix cells',()=>{
     const initial=q('#step-numbers').textContent;

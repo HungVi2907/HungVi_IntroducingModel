@@ -1,6 +1,8 @@
 # Transformer Visual Lab
 
-Trang frontend bằng tiếng Việt giải thích Transformer Encoder–Decoder gốc trong *Attention Is All You Need* (2017).
+Trang giới thiệu tương tác bằng tiếng Việt về Transformer Encoder–Decoder gốc trong *Attention Is All You Need* (2017).
+
+Luồng chính kể câu chuyện qua các kết nối giữa token, nhiều attention head và một lượt Encoder–Decoder sinh câu. Không có sidebar bài học hay chương đánh số. Sơ đồ đầy đủ, công thức, heatmap, causal mask và chi phí n² nằm trong các mục chỉ mở khi người xem chọn. Cỡ chữ dùng hệ số `--text-scale: 1.15`.
 
 ## Chạy tại máy
 
@@ -22,9 +24,10 @@ Cài công cụ kiểm tra bằng `npm install` trước lần chạy test đầ
 
 ## Cấu trúc
 
-- `dist/index.html`: nội dung và cấu trúc trang.
-- `dist/styles.css`: giao diện responsive, hỗ trợ reduced motion.
-- `dist/app.js`: sơ đồ SVG tương tác, lab Attention, Decoder và chi phí n².
+- `dist/index.html`: câu chuyện giới thiệu và các khu vực khám phá tùy chọn.
+- `dist/story.css`: giao diện giới thiệu responsive, hỗ trợ reduced motion.
+- `dist/styles.css`: kiểu dáng của các lab và sơ đồ chi tiết, được story.css sử dụng lại.
+- `dist/app.js`: sơ đồ tương tác, đồng bộ token/head, luồng dịch có thể dừng/tiếp tục, lab Attention, Decoder và chi phí n².
 - `dist/attention.js`: phép chiếu Q/K/V, scaled dot-product attention và causal mask.
 - `server.mjs`: máy chủ xem trước bằng Node.js chuẩn.
 
