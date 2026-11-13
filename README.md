@@ -1,60 +1,56 @@
-# Transformer Visual Lab
+# Transformer ? Gi?i thi?u theo 5 ph?n
 
-Trang giới thiệu tương tác bằng tiếng Việt về Transformer Encoder–Decoder gốc trong *Attention Is All You Need* (2017).
+Frontend ti?ng Vi?t b?m ??ng d?n ?:
 
-Luồng chính kể câu chuyện qua các kết nối giữa token, nhiều attention head và một lượt Encoder–Decoder sinh câu. Không có sidebar bài học hay chương đánh số. Sơ đồ đầy đủ, công thức, heatmap, causal mask và chi phí n² nằm trong các mục chỉ mở khi người xem chọn. Cỡ chữ dùng hệ số `--text-scale: 1.15`.
+1. Motivation ? ??ng l?c ph?t tri?n.
+2. Core Idea & Architecture ? ? t??ng v? ki?n tr?c Encoder?Decoder.
+3. Working Principle ? Q/K/V, c?ng th?c Attention, m?t m? ph?ng token/head v? ghi ch? causal mask.
+4. Advantages & Limitations ? ?u, nh??c ?i?m v? chi ph? n?.
+5. Applications ? D?ch m?y, ph?n lo?i v?n b?n, BERT v? GPT.
 
-Sáu ảnh tham khảo do người dùng chọn được đặt trong hai bộ chọn ảnh: ba góc nhìn tổng quan ở đầu hành trình, và ba hình cơ chế trong “Nhìn vào bên trong”. Mỗi ảnh có chú thích tiếng Việt, nút phóng lớn, điều khiển bàn phím và nguồn tác giả. Ảnh decoding mặc định là poster tĩnh; GIF chỉ tải/phát khi người xem chọn nút phát và được dừng khi đổi ảnh hoặc thu gọn phần chứa nó.
+Kh?ng c? gallery t?ng quan, ch??ng Decoder ri?ng, nhi?u b?n s? ?? c?ng c?p ho?c c?c l?i gi?i thi?u l?p l?i. H?nh b?n trong Encoder, s? li?u Attention v? mask ???c m? theo nhu c?u.
 
-## Chạy tại máy
+## Ch?y local
 
-Cần Node.js 20 trở lên. Không cần cài dependencies.
+C?n Node.js. M?y ch? d?ng c?c module chu?n, kh?ng c?n c?i dependency ?? xem trang.
 
 ```sh
 npm run dev
 ```
 
-Mở http://127.0.0.1:5173. Có thể đặt biến môi trường `PORT` để đổi cổng.
+M? http://127.0.0.1:5173. C? th? ??t bi?n m?i tr??ng `PORT` ?? ??i c?ng.
 
-## Kiểm tra
+## Ki?m tra
 
 ```sh
+npm install
 npm test
 ```
 
-Cài công cụ kiểm tra bằng `npm install` trước lần chạy test đầu tiên. Máy chủ xem trước không cần dependency. Các bài kiểm tra xác minh Softmax, tổng trọng số, phép tổng hợp V của cả 8 head, causal mask và toàn bộ thao tác trên DOM bằng jsdom. Kiểm tra DOM không thay thế kiểm tra giao diện bằng trình duyệt thật.
+Ki?m tra bao g?m c?u tr?c ??ng 5 m?c, d? li?u Attention v? t?ng tr?ng s?, ?i?m ??u/cu?i ???ng n?i, causal mask, n?, reduced motion, ph?ng ?nh v? c?c t?i nguy?n/li?n k?t.
 
-## Cấu trúc
+## T?p ch?nh
 
-- `dist/index.html`: câu chuyện giới thiệu và các khu vực khám phá tùy chọn.
-- `dist/story.css`: giao diện giới thiệu responsive, hỗ trợ reduced motion.
-- `dist/illustrations.js`: bộ sơ đồ SVG vẽ riêng: token/vector, 8 head song song và 6+6 lớp Encoder–Decoder; có bố cục riêng cho màn hình nhỏ.
-- `dist/assets/`: bản SVG và PNG xuất từ cùng mã vẽ, có thể dùng độc lập.
-- `dist/reference-gallery.js` và `dist/reference-gallery.css`: bộ chọn ảnh tham khảo, điều khiển GIF và hộp phóng lớn.
-- `dist/assets/jay-alammar/`: ảnh gốc của Jay Alammar, poster decoding và `sources.json` ghi nguồn/kích thước/giấy phép.
-- `dist/styles.css`: kiểu dáng của các lab và sơ đồ chi tiết, được story.css sử dụng lại.
-- `dist/app.js`: sơ đồ tương tác, đồng bộ token/head, luồng dịch có thể dừng/tiếp tục, lab Attention, Decoder và chi phí n².
-- `dist/attention.js`: phép chiếu Q/K/V, scaled dot-product attention và causal mask.
-- `server.mjs`: máy chủ xem trước bằng Node.js chuẩn.
+- `dist/index.html`: to?n b? n?i dung theo d?n ?.
+- `dist/styles.css`: giao di?n responsive; gi? h? s? ch? `--text-scale: 1.15`.
+- `dist/app.js`: so s?nh RNN/Attention, m? ph?ng Self-Attention, mask v? n?.
+- `dist/attention.js`: ph?p chi?u Q/K/V, Softmax v? t?ng c? tr?ng s?.
+- `dist/image-viewer.js`: ph?ng l?n hai ?nh ki?n tr?c.
+- `dist/assets/jay-alammar/`: hai ?nh ???c s? d?ng v? metadata ngu?n.
+- `server.mjs`: m?y ch? xem tr??c.
 
-Không có backend và không gửi dữ liệu học tập ra ngoài. Phông Be Vietnam Pro được tải từ Google Fonts, với font hệ thống dự phòng.
+C?c module, ?nh, GIF v? ki?m tra d?nh ri?ng cho b? c?c c? ?? ???c g? kh?i b?n tri?n khai. L?ch s? Git v?n l?u c?c phi?n b?n tr??c.
 
-## Phạm vi mô phỏng
+## Ph?m vi minh h?a
 
-Lab dùng vector 4 chiều và d_k = 3 để dễ theo dõi. Ma trận chiếu được tạo xác định, không phải trọng số đã huấn luyện. Attention, heatmap và vector đầu ra đều được tính từ cùng ma trận. Xác suất và bản dịch ở phần Decoder được đặt sẵn để giải thích quá trình sinh token; causal mask là minh họa độc lập.
+Trang n?i v? Transformer Encoder?Decoder g?c trong Attention Is All You Need (2017). M? ph?ng Attention d?ng 8 token t?ch theo t?, vector ??u v?o 4 chi?u v? d_k = 3. C?c ph?p t?nh nh?t qu?n t? d? li?u m? ph?ng, kh?ng ph?i tr?ng s? ?? hu?n luy?n hay c?ng c? d?ch th?c t?. K?ch th??c base g?c ???c ghi r? trong ph?n s? li?u m? r?ng.
 
-Sơ đồ bám cấu hình base gốc: 6 lớp Encoder, 6 lớp Decoder, 8 head, d_model = 512, d_ff = 2048, positional encoding sin/cos và Post-LN. Mỗi khung chỉ vẽ một lớp đại diện. Token trong ví dụ được tách theo từ để dễ đọc, không mô phỏng tokenizer subword của paper.
+Li?n k?t Transformer Explainer minh h?a GPT-2 decoder-only, kh?ng ph?i to?n b? ki?n tr?c Encoder?Decoder c?a paper g?c. Kh?ng nh?ng hay t?i m? h?nh b?n ngo?i v?o trang.
 
-Nguồn: https://arxiv.org/abs/1706.03762
+## Ngu?n
 
-## Tham khảo hình ảnh
+- Paper: https://arxiv.org/abs/1706.03762
+- H?nh ki?n tr?c: https://jalammar.github.io/illustrated-transformer/
+- Tr?c quan h?a GPT-2: https://poloclub.github.io/transformer-explainer/
 
-Tham khảo ngôn ngữ hình ảnh của [The Illustrated Transformer — Jay Alammar (2018)](https://jalammar.github.io/illustrated-transformer/): vector/ma trận thành ô màu, phân cấp mô hình và các luồng dữ liệu rõ ràng. Các sơ đồ SVG tương tác được vẽ riêng; ô màu là ký hiệu rút gọn, không biểu diễn giá trị đo hay toàn bộ kích thước tensor.
-
-Sáu ảnh gốc trong bộ chọn ảnh thuộc Jay Alammar, được ghi nguồn theo [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Các ảnh PNG và GIF gốc được giữ nguyên; `decoding-poster.png` là khung số 40 trích từ GIF để chỉ phát chuyển động khi người xem yêu cầu. Chú thích tiếng Việt do trang bổ sung, không phải bản dịch chữ trực tiếp trong ảnh. Hình dùng hai lớp được đánh dấu là rút gọn; chú thích cũng nêu rõ causal mask của Decoder.
-
-Xuất lại bộ ảnh SVG/PNG sau khi sửa `illustrations.js`:
-
-```sh
-npm run figures
-```
+Hai ?nh g?c thu?c Jay Alammar, ???c gi? nguy?n v? ghi ngu?n theo CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/. C?c ch? th?ch ti?ng Vi?t ???c b? sung b?n ngo?i ?nh.
