@@ -1,11 +1,13 @@
 import {tokens,getAttention,causalMask} from './attention.js';
 import {initializeImageViewer} from './image-viewer.js';
 import {createI18n} from './i18n.js';
+import {initializeVisualAssets} from './visual-assets.js';
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const view=document.defaultView;
 const i18n=createI18n(document),t=(key,values)=>i18n.t(key,values);
 const escape=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+initializeVisualAssets(document,i18n);
 initializeImageViewer(document,i18n);
 
 // One navigation entry for each section in the supplied outline.

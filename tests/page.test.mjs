@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile,access} from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
 import {getAttention,tokens} from '../dist/attention.js';
+import {architectureViews} from '../dist/visual-assets.js';
 
 test('The rebuilt page follows the five-part outline and its focused interactions work',async(t)=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
@@ -22,12 +23,56 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     assert.deepEqual($$('.site-header nav a').map(link=>link.hash),ids.map(id=>'#'+id));
     assert.equal($$('.attention-demo').length,1);
     for(const selector of ['.reference-gallery','.heads-exhibit','#journey-exhibit','#intro-constellation','#visual-tour'])assert.equal($(selector),null);
-    assert.equal($$('main img').length,2);
+    assert.equal($$('main img').length,3);
     assert.equal(doc.documentElement.lang,'en');
     assert.ok($('h1').textContent.includes('An Attention-Based Deep Learning Model'));
     assert.ok($('.external-explainer').textContent.includes('decoder-only GPT-2'));
     assert.ok($('.external-explainer').textContent.includes('not the complete Encoder–Decoder'));
     assert.equal($('.external-explainer a').href,'https://poloclub.github.io/transformer-explainer/');
+  });
+  await t.test('The supplied architecture illustrations progress from simple to detailed and enlarge correctly',async()=>{
+    assert.equal($('#architecture-visual').dataset.view,'pair');
+    for(const [key,data] of Object.entries(architectureViews)){
+      const button=$(`[data-architecture="${key}"]`);button.click();
+      assert.equal(button.getAttribute('aria-pressed'),'true');
+      assert.equal($$('[data-architecture][aria-pressed="true"]').length,1);
+      const image=$('#architecture-image'),trigger=$('#architecture-visual [data-enlarge]');
+      assert.ok(image.src.endsWith(data.file));assert.equal(image.width,data.width);assert.equal(image.height,data.height);
+      await access(new URL('../dist/assets/jay-alammar/'+data.file,import.meta.url));
+      trigger.click();assert.equal($('#enlarged-image').src,image.src);
+      assert.equal($('#enlarged-image').width,data.width);assert.equal($('#enlarged-image').height,data.height);
+      $('#image-close').click();
+    }
+    assert.ok($('#architecture-caption').textContent.includes('original model has six'));
+    assert.ok($('#architecture-caption').textContent.includes('masked'));
+    $('[data-language="vi"]').click();
+    assert.equal($('#architecture-visual').dataset.view,'full');
+    assert.ok($('#architecture-caption').textContent.includes('sáu lớp mỗi phía'));
+    $('#architecture-visual [data-enlarge]').click();
+    assert.equal($('#image-dialog-title').textContent,'Theo dòng kết nối qua các lớp');
+    $('[data-language="en"]').click();
+    assert.equal($('#image-dialog-title').textContent,'Follow the connections through the layers');
+    assert.equal($('#architecture-visual').dataset.view,'full');
+    $('#image-close').click();
+    $('[data-architecture="full"]').dispatchEvent(new window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
+    assert.equal($('#architecture-visual').dataset.view,'encoder');
+    assert.equal(doc.activeElement,$('[data-architecture="encoder"]'));
+    $('[data-architecture="pair"]').click();
+  });
+  await t.test('The decoding GIF loads only on request, survives translation, and stops safely',()=>{
+    const image=$('#decoding-image'),toggle=$('#decoding-toggle'),poster=image.getAttribute('src');
+    assert.ok(poster.endsWith('.png'));assert.equal($$('img[src$=".gif"]').length,0);
+    toggle.click();assert.equal(toggle.getAttribute('aria-pressed'),'true');
+    const animation=image.getAttribute('src');assert.ok(animation.endsWith('transformer_decoding_2.gif'));
+    assert.equal($('#decoding-figure [data-enlarge]').dataset.enlarge,animation);
+    $('[data-language="vi"]').click();assert.equal(toggle.textContent,'■ Dừng ảnh động');
+    assert.equal(image.getAttribute('src'),animation);assert.ok($('#decoding-status').textContent.includes('Đang phát'));
+    $('[data-language="en"]').click();assert.equal(image.getAttribute('src'),animation);
+    toggle.click();assert.equal(image.getAttribute('src'),poster);assert.equal(toggle.getAttribute('aria-pressed'),'false');
+    toggle.click();image.dispatchEvent(new window.Event('error'));
+    assert.equal(image.getAttribute('src'),poster);assert.ok($('#decoding-status').textContent.includes('could not load'));
+    toggle.click();window.dispatchEvent(new window.Event('pagehide'));
+    assert.equal(image.getAttribute('src'),poster);assert.equal(toggle.getAttribute('aria-pressed'),'false');
   });
   await t.test('Token and head changes update the actual attention data and preserve normalization',()=>{
     assert.equal($('#attention-graph .query-node text').textContent,'it');
@@ -121,7 +166,7 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     assert.ok($('#attention-calculations caption').textContent.includes('Vector tại token'));
     assert.ok($('[data-token="1"]').getAttribute('aria-label').includes('Chọn cat'));
     assert.ok($('#mask-message').textContent.includes('Decoder gốc phải dùng causal mask'));
-    assert.equal($('#image-dialog-title').textContent,'Kiến trúc Encoder–Decoder gốc');
+    assert.equal($('#image-dialog-title').textContent,'Decoder còn nhìn vào câu nguồn');
     assert.equal($('#enlarged-image').alt,trigger.dataset.imageTitle);
     assert.equal($('#image-zoom').textContent,'Vừa khung');
     assert.ok($('#image-dialog').open&&$('#image-dialog').classList.contains('zoomed'));
