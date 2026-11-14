@@ -27,24 +27,19 @@ export function initializeVisualAssets(doc,i18n){
     });
   });
 
-  const animation=doc.querySelector('#decoding-image'),stage=doc.querySelector('.decoding-stage'),toggle=doc.querySelector('#decoding-toggle'),status=doc.querySelector('#decoding-status'),animationEnlarge=doc.querySelector('#decoding-figure [data-enlarge]');
-  let playing=false,failed=false,phase='idle',preludeTimer;
-  function clearPrelude(){if(preludeTimer){view.clearTimeout(preludeTimer);preludeTimer=undefined;}}
+  const animation=doc.querySelector('#decoding-image'),toggle=doc.querySelector('#decoding-toggle'),status=doc.querySelector('#decoding-status'),animationEnlarge=doc.querySelector('#decoding-figure [data-enlarge]');
+  let playing=false,failed=false;
   function renderAnimationText(){
     toggle.setAttribute('aria-pressed',String(playing));
     toggle.textContent=i18n.t(playing?'decoding.stop':'decoding.play');
-    stage.dataset.phase=phase;
-    status.textContent=i18n.t(failed?'decoding.error':phase==='prelude'?'decoding.preludeStatus':playing?'decoding.playing':'decoding.idle');
+    status.textContent=i18n.t(failed?'decoding.error':playing?'decoding.playing':'decoding.idle');
   }
   function setPlaying(next){
-    clearPrelude();
     playing=next;failed=false;
     const src=playing?animation.dataset.animation:animation.dataset.poster;
     if(animation.getAttribute('src')!==src)animation.src=src;
     animationEnlarge.dataset.enlarge=src;
-    phase=playing?'prelude':'idle';
     renderAnimationText();
-    if(playing)preludeTimer=view.setTimeout(()=>{if(playing){phase='animation';preludeTimer=undefined;renderAnimationText();}},1800);
   }
   toggle.addEventListener('click',()=>setPlaying(!playing));
   animation.addEventListener('error',()=>{

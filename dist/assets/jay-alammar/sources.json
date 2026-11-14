@@ -37,10 +37,10 @@
       "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
     },
     {
-      "file": "transformer_decoding_2.gif",
+      "file": "transformer_decoding_1.gif",
       "width": 1438,
       "height": 790,
-      "source": "https://jalammar.github.io/images/t/transformer_decoding_2.gif",
+      "source": "D:\\CV\\tranformer\\assets\\transformer_decoding_1.gif",
       "author": "Jay Alammar",
       "article": "https://jalammar.github.io/illustrated-transformer/",
       "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
@@ -49,11 +49,11 @@
       "file": "decoding-poster.png",
       "width": 1438,
       "height": 790,
-      "source": "https://jalammar.github.io/images/t/transformer_decoding_2.gif",
+      "source": "D:\\CV\\tranformer\\assets\\transformer_decoding_1.gif",
       "author": "Jay Alammar",
       "article": "https://jalammar.github.io/illustrated-transformer/",
       "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-      "derivative": "Static frame from the decoding animation; provided in local reference assets."
+      "derivative": "Static first frame from the user-provided decoding animation."
     }
   ]
 }
