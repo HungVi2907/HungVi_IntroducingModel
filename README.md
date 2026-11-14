@@ -1,56 +1,49 @@
-# Transformer ? Gi?i thi?u theo 5 ph?n
+# Transformer — A five-part visual introduction
 
-Frontend ti?ng Vi?t b?m ??ng d?n ?:
+A buildless English / Vietnamese frontend about the original Transformer in *Attention Is All You Need* (2017). The page follows five sections: motivation, Encoder–Decoder architecture, working principle, advantages and limitations, and applications.
 
-1. Motivation ? ??ng l?c ph?t tri?n.
-2. Core Idea & Architecture ? ? t??ng v? ki?n tr?c Encoder?Decoder.
-3. Working Principle ? Q/K/V, c?ng th?c Attention, m?t m? ph?ng token/head v? ghi ch? causal mask.
-4. Advantages & Limitations ? ?u, nh??c ?i?m v? chi ph? n?.
-5. Applications ? D?ch m?y, ph?n lo?i v?n b?n, BERT v? GPT.
+English is the first-visit default, independent of the browser language. The header language switch updates the content, captions, image viewer, interactive diagrams and accessibility labels without reloading. The choice is saved under `transformer-language` in browser localStorage. If storage is unavailable, switching still works for the current visit. Switching preserves selected tokens, heads, sequence length, mask settings, expanded details and image zoom.
 
-Kh?ng c? gallery t?ng quan, ch??ng Decoder ri?ng, nhi?u b?n s? ?? c?ng c?p ho?c c?c l?i gi?i thi?u l?p l?i. H?nh b?n trong Encoder, s? li?u Attention v? mask ???c m? theo nhu c?u.
+## Run locally
 
-## Ch?y local
-
-C?n Node.js. M?y ch? d?ng c?c module chu?n, kh?ng c?n c?i dependency ?? xem trang.
+Requires Node.js. No dependencies are needed to serve the page.
 
 ```sh
 npm run dev
 ```
 
-M? http://127.0.0.1:5173. C? th? ??t bi?n m?i tr??ng `PORT` ?? ??i c?ng.
+Open http://127.0.0.1:5173. Set `PORT` to use another port.
 
-## Ki?m tra
+## Verification
 
 ```sh
 npm install
 npm test
 ```
 
-Ki?m tra bao g?m c?u tr?c ??ng 5 m?c, d? li?u Attention v? t?ng tr?ng s?, ?i?m ??u/cu?i ???ng n?i, causal mask, n?, reduced motion, ph?ng ?nh v? c?c t?i nguy?n/li?n k?t.
+Tests cover the five-section structure, attention calculations and normalization, connection geometry, causal masking, quadratic attention cost, reduced motion, image zoom, language defaults, saved preferences, translation coverage and state preservation.
 
-## T?p ch?nh
+## Main files
 
-- `dist/index.html`: to?n b? n?i dung theo d?n ?.
-- `dist/styles.css`: giao di?n responsive; gi? h? s? ch? `--text-scale: 1.15`.
-- `dist/app.js`: so s?nh RNN/Attention, m? ph?ng Self-Attention, mask v? n?.
-- `dist/attention.js`: ph?p chi?u Q/K/V, Softmax v? t?ng c? tr?ng s?.
-- `dist/image-viewer.js`: ph?ng l?n hai ?nh ki?n tr?c.
-- `dist/assets/jay-alammar/`: hai ?nh ???c s? d?ng v? metadata ngu?n.
-- `server.mjs`: m?y ch? xem tr??c.
+- `dist/index.html`: English default HTML with translation bindings.
+- `dist/i18n.js`: English and Vietnamese content, translation bindings and language preference.
+- `dist/styles.css`: responsive layout, language selector and the existing `--text-scale: 1.15` setting.
+- `dist/app.js`: RNN comparison, Self-Attention, mask and sequence-length interactions.
+- `dist/attention.js`: Q/K/V projections, Softmax and weighted sums.
+- `dist/image-viewer.js`: architecture image enlargement and zoom.
+- `dist/assets/jay-alammar/`: two source images and attribution metadata.
+- `server.mjs`: local preview server.
 
-C?c module, ?nh, GIF v? ki?m tra d?nh ri?ng cho b? c?c c? ?? ???c g? kh?i b?n tri?n khai. L?ch s? Git v?n l?u c?c phi?n b?n tr??c.
+When editing translated content, update both catalogs in `dist/i18n.js` and the corresponding default English markup in `dist/index.html`. Keep translated elements separate from inputs, selects and other stateful DOM nodes.
 
-## Ph?m vi minh h?a
+## Scope and sources
 
-Trang n?i v? Transformer Encoder?Decoder g?c trong Attention Is All You Need (2017). M? ph?ng Attention d?ng 8 token t?ch theo t?, vector ??u v?o 4 chi?u v? d_k = 3. C?c ph?p t?nh nh?t qu?n t? d? li?u m? ph?ng, kh?ng ph?i tr?ng s? ?? hu?n luy?n hay c?ng c? d?ch th?c t?. K?ch th??c base g?c ???c ghi r? trong ph?n s? li?u m? r?ng.
+The Attention demo uses eight word tokens, four-dimensional inputs and `d_k = 3`. Its deterministic illustrative data is internally consistent, but does not come from a trained model. The original base-model dimensions are stated in the expandable calculation details.
 
-Li?n k?t Transformer Explainer minh h?a GPT-2 decoder-only, kh?ng ph?i to?n b? ki?n tr?c Encoder?Decoder c?a paper g?c. Kh?ng nh?ng hay t?i m? h?nh b?n ngo?i v?o trang.
+The Transformer Explainer link illustrates decoder-only GPT-2 rather than the full Encoder–Decoder architecture. No external models are embedded or downloaded.
 
-## Ngu?n
+- Original paper: https://arxiv.org/abs/1706.03762
+- Architecture images: https://jalammar.github.io/illustrated-transformer/
+- GPT-2 visualization: https://poloclub.github.io/transformer-explainer/
 
-- Paper: https://arxiv.org/abs/1706.03762
-- H?nh ki?n tr?c: https://jalammar.github.io/illustrated-transformer/
-- Tr?c quan h?a GPT-2: https://poloclub.github.io/transformer-explainer/
-
-Hai ?nh g?c thu?c Jay Alammar, ???c gi? nguy?n v? ghi ngu?n theo CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/. C?c ch? th?ch ti?ng Vi?t ???c b? sung b?n ngo?i ?nh.
+The two original images belong to Jay Alammar and retain their attribution under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Translated captions are provided outside the images.

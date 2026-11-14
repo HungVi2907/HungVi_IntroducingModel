@@ -23,9 +23,10 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     assert.equal($$('.attention-demo').length,1);
     for(const selector of ['.reference-gallery','.heads-exhibit','#journey-exhibit','#intro-constellation','#visual-tour'])assert.equal($(selector),null);
     assert.equal($$('main img').length,2);
-    assert.ok($('h1').textContent.includes('Mô hình Deep Learning dựa trên Attention'));
-    assert.ok($('.external-explainer').textContent.includes('GPT-2 dạng decoder-only'));
-    assert.ok($('.external-explainer').textContent.includes('không phải toàn bộ Encoder–Decoder'));
+    assert.equal(doc.documentElement.lang,'en');
+    assert.ok($('h1').textContent.includes('An Attention-Based Deep Learning Model'));
+    assert.ok($('.external-explainer').textContent.includes('decoder-only GPT-2'));
+    assert.ok($('.external-explainer').textContent.includes('not the complete Encoder–Decoder'));
     assert.equal($('.external-explainer a').href,'https://poloclub.github.io/transformer-explainer/');
   });
   await t.test('Token and head changes update the actual attention data and preserve normalization',()=>{
@@ -65,7 +66,7 @@ test('The rebuilt page follows the five-part outline and its focused interaction
   await t.test('The decoder mask correctly blocks the future and labels its disabled state',()=>{
     assert.equal($$('.mask-cell.blocked').length,6);
     $('#mask-enabled').click();assert.equal($$('.mask-cell.blocked').length,0);
-    assert.ok($('#mask-message').textContent.includes('Decoder gốc phải dùng causal mask'));
+    assert.ok($('#mask-message').textContent.includes('original Decoder must use a causal mask'));
     $('#mask-enabled').click();assert.equal($$('.mask-cell.blocked').length,6);
   });
   await t.test('Sequence length changes the number of attention pairs quadratically',()=>{
@@ -82,6 +83,11 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     reducedMotion=false;$('#run-comparison').click();
     assert.equal($('#run-comparison').disabled,true);
     assert.equal($$('#rnn-visual .sequence-token.active').length,1);
+    $('[data-language="vi"]').click();
+    assert.equal($('#run-comparison').disabled,true);
+    assert.equal($$('#rnn-visual .sequence-token.active').length,1);
+    assert.ok($('#comparison-status').textContent.includes('RNN đi lần lượt'));
+    $('[data-language="en"]').click();
     window.dispatchEvent(new window.Event('pagehide'));
     assert.equal($('#run-comparison').disabled,false);
   });
@@ -95,6 +101,40 @@ test('The rebuilt page follows the five-part outline and its focused interaction
       $('#image-dialog').dispatchEvent(new window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
       assert.equal($('#image-dialog').open,false);assert.equal(doc.activeElement,trigger);
     }
+  });
+  await t.test('Switching both languages translates interactive labels without resetting state',()=>{
+    $('[data-token="1"]').click();
+    $('#head-select').value='3';$('#head-select').dispatchEvent(new window.Event('change'));
+    $('#mask-enabled').click();
+    for(const details of $$('details'))details.open=true;
+    const weights=$$('#attention-graph .attention-link').map(node=>node.dataset.weight);
+    const controls=['#head-select','#mask-enabled','#length-slider'].map(selector=>$(selector));
+    const trigger=$('[data-enlarge]');trigger.click();$('#image-zoom').click();
+    $('[data-language="vi"]').click();
+    assert.equal(doc.documentElement.lang,'vi');
+    assert.equal(window.localStorage.getItem('transformer-language'),'vi');
+    assert.equal($('[data-language="vi"]').getAttribute('aria-pressed'),'true');
+    assert.ok($('h1').textContent.includes('Mô hình Deep Learning dựa trên Attention'));
+    assert.equal($('#attention-graph .query-node text').textContent,'cat');
+    assert.equal($('#head-select').value,'3');
+    assert.deepEqual($$('#attention-graph .attention-link').map(node=>node.dataset.weight),weights);
+    assert.ok($('#attention-calculations caption').textContent.includes('Vector tại token'));
+    assert.ok($('[data-token="1"]').getAttribute('aria-label').includes('Chọn cat'));
+    assert.ok($('#mask-message').textContent.includes('Decoder gốc phải dùng causal mask'));
+    assert.equal($('#image-dialog-title').textContent,'Kiến trúc Encoder–Decoder gốc');
+    assert.equal($('#enlarged-image').alt,trigger.dataset.imageTitle);
+    assert.equal($('#image-zoom').textContent,'Vừa khung');
+    assert.ok($('#image-dialog').open&&$('#image-dialog').classList.contains('zoomed'));
+    assert.ok($$('details').every(node=>node.open));
+    assert.equal($('#length-slider').value,'16');assert.equal($('#pair-count').textContent,'256');
+    assert.equal($('#mask-enabled').checked,false);
+    assert.deepEqual(['#head-select','#mask-enabled','#length-slider'].map(selector=>$(selector)),controls);
+    $('[data-language="en"]').click();
+    assert.equal(doc.documentElement.lang,'en');
+    assert.equal($('#image-zoom').textContent,'Fit to view');
+    assert.equal($('#image-dialog-title').textContent,trigger.dataset.imageTitle);
+    assert.equal($('#head-select').value,'3');assert.ok($$('details').every(node=>node.open));
+    $('#image-close').click();
   });
   await t.test('Local assets and navigation resolve, controls have names and IDs stay unique',async()=>{
     for(const a of $$('a[href^="#"]'))assert.ok($(a.hash));
