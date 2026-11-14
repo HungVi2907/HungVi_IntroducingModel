@@ -59,16 +59,24 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     assert.equal(doc.activeElement,$('[data-architecture="encoder"]'));
     $('[data-architecture="pair"]').click();
   });
-  await t.test('The decoding GIF loads only on request, survives translation, and stops safely',()=>{
+  await t.test('The decoding experience visibly starts with step 1 before revealing the supplied GIF',async()=>{
     const image=$('#decoding-image'),toggle=$('#decoding-toggle'),poster=image.getAttribute('src');
     assert.ok(poster.endsWith('.png'));assert.equal($$('img[src$=".gif"]').length,0);
     toggle.click();assert.equal(toggle.getAttribute('aria-pressed'),'true');
     const animation=image.getAttribute('src');assert.ok(animation.endsWith('transformer_decoding_2.gif'));
+    assert.equal($('.decoding-stage').dataset.phase,'prelude');
+    assert.ok($('.decoding-prelude').textContent.includes('Step 1'));
+    assert.ok($('#decoding-status').textContent.includes('Step 1'));
     assert.equal($('#decoding-figure [data-enlarge]').dataset.enlarge,animation);
     $('[data-language="vi"]').click();assert.equal(toggle.textContent,'■ Dừng ảnh động');
-    assert.equal(image.getAttribute('src'),animation);assert.ok($('#decoding-status').textContent.includes('Đang phát'));
+    assert.equal(image.getAttribute('src'),animation);assert.ok($('#decoding-status').textContent.includes('Bước 1'));
+    assert.ok($('.decoding-prelude').textContent.includes('Bước 1'));
     $('[data-language="en"]').click();assert.equal(image.getAttribute('src'),animation);
+    await new Promise(resolve=>window.setTimeout(resolve,1850));
+    assert.equal($('.decoding-stage').dataset.phase,'animation');
+    assert.ok($('#decoding-status').textContent.includes('step 2 predicts'));
     toggle.click();assert.equal(image.getAttribute('src'),poster);assert.equal(toggle.getAttribute('aria-pressed'),'false');
+    assert.equal($('.decoding-stage').dataset.phase,'idle');
     toggle.click();image.dispatchEvent(new window.Event('error'));
     assert.equal(image.getAttribute('src'),poster);assert.ok($('#decoding-status').textContent.includes('could not load'));
     toggle.click();window.dispatchEvent(new window.Event('pagehide'));
