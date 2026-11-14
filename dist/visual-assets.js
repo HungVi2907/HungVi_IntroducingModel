@@ -6,7 +6,7 @@ export const architectureViews={
 };
 
 export function initializeVisualAssets(doc,i18n){
-  const view=doc.defaultView,figure=doc.querySelector('#architecture-visual'),image=figure.querySelector('img'),enlarge=figure.querySelector('[data-enlarge]');
+  const figure=doc.querySelector('#architecture-visual'),image=figure.querySelector('img'),enlarge=figure.querySelector('[data-enlarge]');
   const buttons=[...doc.querySelectorAll('[data-architecture]')];
   let selected='pair';
   function renderArchitecture(){
@@ -27,28 +27,7 @@ export function initializeVisualAssets(doc,i18n){
     });
   });
 
-  const animation=doc.querySelector('#decoding-image'),toggle=doc.querySelector('#decoding-toggle'),status=doc.querySelector('#decoding-status'),animationEnlarge=doc.querySelector('#decoding-figure [data-enlarge]');
-  let playing=false,failed=false;
-  function renderAnimationText(){
-    toggle.setAttribute('aria-pressed',String(playing));
-    toggle.textContent=i18n.t(playing?'decoding.stop':'decoding.play');
-    status.textContent=i18n.t(failed?'decoding.error':playing?'decoding.playing':'decoding.idle');
-  }
-  function setPlaying(next){
-    playing=next;failed=false;
-    const src=playing?animation.dataset.animation:animation.dataset.poster;
-    if(animation.getAttribute('src')!==src)animation.src=src;
-    animationEnlarge.dataset.enlarge=src;
-    renderAnimationText();
-  }
-  toggle.addEventListener('click',()=>setPlaying(!playing));
-  animation.addEventListener('error',()=>{
-    if(!playing)return;
-    setPlaying(false);failed=true;renderAnimationText();
-  });
-  view.addEventListener('pagehide',()=>setPlaying(false));
-  doc.addEventListener('visibilitychange',()=>{if(doc.hidden&&playing)setPlaying(false);});
-  // Language updates only text, keeping the chosen view and GIF playback intact.
-  i18n.subscribe(()=>{renderArchitecture();renderAnimationText();});
-  renderArchitecture();renderAnimationText();
+  // The decoding GIF loads directly, so it starts from its first frame without a Play action.
+  i18n.subscribe(renderArchitecture);
+  renderArchitecture();
 }

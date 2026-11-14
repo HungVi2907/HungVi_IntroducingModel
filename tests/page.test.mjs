@@ -59,24 +59,17 @@ test('The rebuilt page follows the five-part outline and its focused interaction
     assert.equal(doc.activeElement,$('[data-architecture="encoder"]'));
     $('[data-architecture="pair"]').click();
   });
-  await t.test('The replacement decoding GIF begins directly at step 1',()=>{
-    const image=$('#decoding-image'),toggle=$('#decoding-toggle'),poster=image.getAttribute('src');
-    assert.ok(poster.endsWith('.png'));assert.equal($$('img[src$=".gif"]').length,0);
-    assert.equal($('.decoding-prelude'),null);
-    assert.equal(image.dataset.animation,'./assets/jay-alammar/transformer_decoding_1.gif');
-    assert.ok($('#decoding-status').textContent.includes('step 1'));
-    toggle.click();assert.equal(toggle.getAttribute('aria-pressed'),'true');
-    const animation=image.getAttribute('src');assert.ok(animation.endsWith('transformer_decoding_1.gif'));
-    assert.ok($('#decoding-status').textContent.includes('Playing'));
-    assert.equal($('#decoding-figure [data-enlarge]').dataset.enlarge,animation);
-    $('[data-language="vi"]').click();assert.equal(toggle.textContent,'■ Dừng ảnh động');
-    assert.equal(image.getAttribute('src'),animation);assert.ok($('#decoding-status').textContent.includes('Đang phát'));
-    $('[data-language="en"]').click();assert.equal(image.getAttribute('src'),animation);
-    toggle.click();assert.equal(image.getAttribute('src'),poster);assert.equal(toggle.getAttribute('aria-pressed'),'false');
-    toggle.click();image.dispatchEvent(new window.Event('error'));
-    assert.equal(image.getAttribute('src'),poster);assert.ok($('#decoding-status').textContent.includes('could not load'));
-    toggle.click();window.dispatchEvent(new window.Event('pagehide'));
-    assert.equal(image.getAttribute('src'),poster);assert.equal(toggle.getAttribute('aria-pressed'),'false');
+  await t.test('The replacement decoding GIF autoplays directly from step 1 without a control',()=>{
+    const image=$('#decoding-image'),trigger=$('#decoding-figure [data-enlarge]');
+    assert.ok(image.getAttribute('src').endsWith('transformer_decoding_1.gif'));
+    assert.equal($$('#decoding-toggle').length,0);
+    assert.equal($$('img[src$=".gif"]').length,1);
+    assert.equal(trigger.dataset.enlarge,image.getAttribute('src'));
+    assert.ok($('#decoding-status').textContent.includes('automatically from decoding step 1'));
+    $('[data-language="vi"]').click();
+    assert.ok($('#decoding-status').textContent.includes('tự chạy từ bước giải mã số 1'));
+    assert.ok(image.getAttribute('src').endsWith('transformer_decoding_1.gif'));
+    $('[data-language="en"]').click();
   });
   await t.test('Token and head changes update the actual attention data and preserve normalization',()=>{
     assert.equal($('#attention-graph .query-node text').textContent,'it');
